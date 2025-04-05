@@ -73,5 +73,7 @@ def create_listing(request):
         return HttpResponseRedirect(reverse("index"))
     return render(request, "auctions/create_listing.html")
 
-def open_listing(request):
-    pass
+def open_listing(request, id):
+    listing = Listing.objects.get(pk=id)
+    context = {"listing": listing}
+    return render(request, 'auctions/listing.html', context)
