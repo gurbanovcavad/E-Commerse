@@ -1,0 +1,29 @@
+body {
+    padding: 10px;
+}
+
+.listing {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.listing-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.title {
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.price {
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
+.created-at {
+    font-size: 12px;
+    color: gray;
+}

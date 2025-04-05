@@ -1,0 +1,42 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    {% if request.user.is_authenticated %}
+    <form action="{% url 'create_listing' %}" method="post">
+        {% csrf_token %}
+        <div>
+            <label for="id_title">Title:</label>
+            <input id="id_title" type="text" name="title" placeholder="Enter a title" required>
+        </div>
+
+        <div>
+            <label for="id_description" style="display:block;">Description: </label>
+            <textarea id="id_description" name="description" id="" style="width:300px; height:150px; margin-left:90px;" required placeholder="Add a description"></textarea>
+        </div>
+
+        <div>
+            <label for="id_starting_bid">Starting Bid: </label>
+            <input id="id_starting_bid" type="number" name="starting_bid" placeholder="Enter the starting bid" required>
+        </div>
+        
+        <div>
+            <label for="id_image_url">Image URL (Optional): </label>
+            <input id="id_image_url" type="url" name="image_url" placeholder="Optional">
+        </div>
+
+        <div>
+            <label for="id_category">Category (Optional): </label>
+            <input id="id_category" type="text" name="category" placeholder="Optoinal">
+        </div>
+
+        <input type="submit" value="Submit">
+    </form>
+    {% else %}
+        <li class="nav-item">
+            <a class="nav-link" href="{% url 'login' %}">Log In</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{% url 'register' %}">Register</a>
+        </li>
+    {% endif %}
+{% endblock %}
