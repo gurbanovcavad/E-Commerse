@@ -6,7 +6,6 @@ from django.urls import reverse
 
 from .models import User
 
-
 def index(request):
     return render(request, "auctions/index.html")
 
@@ -23,12 +22,10 @@ def login_view(request):
         if user is not None:
             login(request, user)
             return HttpResponseRedirect(reverse("index"))
-        else:
-            return render(request, "auctions/login.html", {
-                "message": "Invalid username and/or password."
-            })
-    else:
-        return render(request, "auctions/login.html")
+        return render(request, "auctions/login.html", {
+            "message": "Invalid username and/or password."
+        })
+    return render(request, "auctions/login.html")
 
 
 def logout_view(request):
@@ -59,5 +56,4 @@ def register(request):
             })
         login(request, user)
         return HttpResponseRedirect(reverse("index"))
-    else:
-        return render(request, "auctions/register.html")
+    return render(request, "auctions/register.html")
