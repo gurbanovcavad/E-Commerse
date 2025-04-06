@@ -77,14 +77,26 @@ def create_listing(request):
 def place_bid(request, id):
     if request.method == 'POST':
         try:      
-            amount = int(request.POST['bid'])
+            amount = float(request.POST['bid'])
+            print(amount)
             listing = Listing.objects.get(pk=id)
+            if amount <= listing.current_price:
+                raise Exception()
+            else:
+                listing.current_price = amount
+                listing.save()
             user = request.user
             bid = Bid(amount=amount, bidder=user,listing=listing)
             bid.save()
             return HttpResponseRedirect(reverse("open_listing", args=[id,]))
         except:
-            return HttpResponseRedirect(reverse('open_listing', args=[id,]))
+            context = {"message": "Something went wrong."}
+            response = render(request, 'auctions/404.html', context)
+            response.status_code = 404
+            return response
+    return HttpResponseRedirect(reverse('index'))
+       
+@login_required 
 def open_listing(request, id):
     listing = Listing.objects.get(pk=id)
     count = Listing.objects.get(pk=id).bids.all().count()
@@ -106,8 +118,27 @@ def add_watching(request, id):
         listing.save()
         return HttpResponseRedirect(reverse('index'))
     except:
-        return HttpResponseRedirect(reverse('index'))
+        context = {"message": "Something went wrong."}
+        response = render(request, 'auctions/404.html', context)
+        response.status_code = 404
+        return response
     
+@login_required    
+def close_auction(request, id):
+    if request.method == "POST":
+        listing = Listing.objects.get(pk=id)
+        bids = listing.bids.all()
+        listing.is_active=False
+        if not bids:
+            listing.save()
+            return HttpResponseRedirect(reverse('index'))
+        max_bid = max(bids, key=lambda x: x.amount)
+        listing.winner = max_bid.bidder
+        listing.save()
+        print(listing.is_active)
+        return HttpResponseRedirect(reverse('index'))
+    return HttpResponseRedirect(reverse('index'))
+
 @login_required
 def delete_watchlist(request, id):
     pass

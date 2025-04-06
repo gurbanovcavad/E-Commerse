@@ -4,7 +4,7 @@
     <div style="font-weight:bold; font-size:30px;">Listing: {{listing.title}}</div>
     <div style="width:100%; height: 320px;"><img style="width: 350px; height: 300px;" src="{{listing.image_url}}" alt=""></div>
     <div>{{listing.description}}</div>
-    <div style="font-weight:bold; font-size:25px;">${{listing.starting_bid}}</div>
+    <div style="font-weight:bold; font-size:25px;">${{listing.current_price}}</div>
 
     {% if request.user.is_authenticated %}
         <div>{{count}} bid(s) so far. Your bid is the current bid.</div>
