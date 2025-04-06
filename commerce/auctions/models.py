@@ -15,6 +15,9 @@ class Listing(models.Model):
     is_active = models.BooleanField(default=True)
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name="listings")
     winner = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name="won_auctions")
+
+    def __str__(self):
+        return f"{self.title}"
     
 class Bid(models.Model):
     listing = models.ForeignKey(Listing, on_delete=models.CASCADE, related_name="bids")
@@ -27,3 +30,14 @@ class Comment(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name="comments")
     content = models.TextField()
     timestamp = models.DateTimeField(auto_now_add=True)     
+    
+class WatchListing(models.Model):
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name="watch_list")
+    listing = models.ForeignKey(Listing, on_delete=models.CASCADE, related_name="watchings")
+    
+    class Meta:
+        unique_together = ('owner', 'listing')
+    
+    def __str__(self):
+        return f"{self.owner} is watching {self.listing}"
+     

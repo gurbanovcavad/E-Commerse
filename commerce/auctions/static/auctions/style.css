@@ -3,6 +3,7 @@ body {
 }
 
 .listing {
+    color: black;
     display: flex;
     gap: 20px;
     margin-bottom: 20px;

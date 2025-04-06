@@ -3,8 +3,9 @@ from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
+from django.contrib.auth.decorators import login_required
 
-from .models import User, Listing
+from .models import User, Listing, WatchListing, Bid
 
 def index(request):
     context = {"listings": Listing.objects.all()}
@@ -73,7 +74,40 @@ def create_listing(request):
         return HttpResponseRedirect(reverse("index"))
     return render(request, "auctions/create_listing.html")
 
+def place_bid(request, id):
+    if request.method == 'POST':
+        try:      
+            amount = int(request.POST['bid'])
+            listing = Listing.objects.get(pk=id)
+            user = request.user
+            bid = Bid(amount=amount, bidder=user,listing=listing)
+            bid.save()
+            return HttpResponseRedirect(reverse("open_listing", args=[id,]))
+        except:
+            return HttpResponseRedirect(reverse('open_listing', args=[id,]))
 def open_listing(request, id):
     listing = Listing.objects.get(pk=id)
-    context = {"listing": listing}
+    count = Listing.objects.get(pk=id).bids.all().count()
+    context = {"listing": listing, "count": count}
     return render(request, 'auctions/listing.html', context)
+
+@login_required
+def watch_list(request):
+    user = User.objects.get(pk=request.user.id)
+    watch_list = user.watch_list.all()
+    listings = [Listing.objects.get(pk=listing.listing_id) for listing in watch_list]
+    context = {"listings": listings} 
+    return render(request, "auctions/watch_list.html", context)
+
+@login_required
+def add_watching(request, id):
+    try:
+        listing = WatchListing(owner=User.objects.get(pk=request.user.id), listing=Listing.objects.get(pk=id))
+        listing.save()
+        return HttpResponseRedirect(reverse('index'))
+    except:
+        return HttpResponseRedirect(reverse('index'))
+    
+@login_required
+def delete_watchlist(request, id):
+    pass

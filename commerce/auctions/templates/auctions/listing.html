@@ -1,5 +1,28 @@
 {% extends 'auctions/layout.html' %}
 
 {% block body %}
-    
+    <div style="font-weight:bold; font-size:30px;">Listing: {{listing.title}}</div>
+    <div style="width:100%; height: 320px;"><img style="width: 350px; height: 300px;" src="{{listing.image_url}}" alt=""></div>
+    <div>{{listing.description}}</div>
+    <div style="font-weight:bold; font-size:25px;">${{listing.starting_bid}}</div>
+
+    {% if request.user.is_authenticated %}
+        <div>{{count}} bid(s) so far. Your bid is the current bid.</div>
+        <form action="{% url 'place_bid' listing.id %}" style="margin-left:1px;" method="post">
+            {% csrf_token %}
+            <input type="text" name="bid" placeholder="Bid" style="display: block; width: 100%; height: 45px; margin-bottom: 8px; padding: 8px; border-radius: 5px;">
+            <input type="submit" value="Place Bid" style="background-color: rgb(82, 82, 252); color: white; border: 0.1px; border-radius: 5px; width: 110px; height: 45px; font-size:19px;">
+        </form>
+    {% endif %}
+
+    <h3>Details:</h2>
+    <ul>
+        <li>Listed by {{listing.owner}}</li>
+
+        {% if listing.category %} 
+            <li>Category: {{listing.category}}</li>
+        {% else %}
+            <li>Category: No Category Listed</li>
+        {% endif %}
+    </ul>
 {% endblock %}

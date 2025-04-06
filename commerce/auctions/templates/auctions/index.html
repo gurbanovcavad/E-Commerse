@@ -4,18 +4,20 @@
     <h2>Active Listings</h2>
 
     {% for listing in listings %}
-        <div class="listing">
-            {% if listing.image_url %}
-            <span style="width:400px; height:200px;">
-                <img src="{{listing.image_url}}" alt="">
-            </span>
-            {% endif %}
-            <div class="listing-info">
-                <div class="title">{{listing.title}}</div>
-                <div class="price">Price: ${{listing.starting_bid}}</div>
-                <!-- <div class="description">Description: {{listing.description}}</div> -->
-                <div class="created-at">Created {{listing.created_at}}</div>
-            </div>
+    <div class="listing">
+            <a class="listing" href="{% url 'open_listing' listing.id %}">
+                {% if listing.image_url %}
+                <span style="width:400px; height:200px;">
+                    <img src="{{listing.image_url}}" alt="">
+                </span>
+                {% endif %}
+                <div class="listing-info">
+                    <div class="title">{{listing.title}}</div>
+                    <div class="price">Price: ${{listing.starting_bid}}</div>
+                    <!-- <div class="description">Description: {{listing.description}}</div> -->
+                    <div class="created-at">Created {{listing.created_at}}</div>
+                </div>
+            </a>
         </div>
     {% empty %}
         <div>No active listing.</div>
