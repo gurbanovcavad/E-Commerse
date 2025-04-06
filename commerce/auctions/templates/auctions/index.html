@@ -4,29 +4,27 @@
     <h2>Active Listings</h2>
 
     {% for listing in listings %}
-        {% if listing.is_active %}
-            <div class="listing">
-                    <a class="listing" href="{% url 'open_listing' listing.id %}">
-                        {% if listing.image_url %}
-                        <span style="width:400px; height:200px;">
-                            <img src="{{listing.image_url}}" alt="">
-                        </span>
+        <div class="listing">
+                <a class="listing" href="{% url 'open_listing' listing.id %}">
+                    {% if listing.image_url %}
+                    <span style="width:400px; height:200px;">
+                        <img src="{{listing.image_url}}" alt="">
+                    </span>
+                    {% endif %}
+                    <div class="listing-info">
+                        <div class="title">{{listing.title}}</div>
+                        <div class="price">Price: ${{listing.current_price}}</div>
+                        <!-- <div class="description">Description: {{listing.description}}</div> -->
+                        <div class="created-at" style="margin-bottom:10px;">Created {{listing.created_at}}</div>
+                        {% if request.user.id == listing.owner.id and listing.is_active %}
+                            <form action="{% url 'close_auction' listing.id %}" method="post"> 
+                                {% csrf_token %}
+                                <input type="submit" value="Close">
+                            </form>
                         {% endif %}
-                        <div class="listing-info">
-                            <div class="title">{{listing.title}}</div>
-                            <div class="price">Price: ${{listing.current_price}}</div>
-                            <!-- <div class="description">Description: {{listing.description}}</div> -->
-                            <div class="created-at" style="margin-bottom:10px;">Created {{listing.created_at}}</div>
-                            {% if request.user.id == listing.owner.id %}
-                                <form action="{% url 'close_auction' listing.id %}" method="post"> 
-                                    {% csrf_token %}
-                                    <input type="submit" value="Close">
-                                </form>
-                            {% endif %}
-                        </div>
-                    </a>
-            </div>
-        {% endif %}
+                    </div>
+                </a>
+        </div>
     {% empty %}
         <div>No active listing.</div>
     {% endfor %}
