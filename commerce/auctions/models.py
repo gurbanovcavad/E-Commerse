@@ -41,7 +41,7 @@ class Comment(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)     
     
 class WatchListing(models.Model):
-    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name="watch_list")
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name="watchlist")
     listing = models.ForeignKey(Listing, on_delete=models.CASCADE, related_name="watchings")
     
     class Meta:

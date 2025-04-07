@@ -100,13 +100,17 @@ def place_bid(request, id):
 def open_listing(request, id):
     listing = Listing.objects.get(pk=id)
     count = Listing.objects.get(pk=id).bids.all().count()
-    context = {"listing": listing, "count": count}
+    try:
+        is_watching = True if User.objects.get(pk=request.user.id).watchlist.get(listing=id) else False
+    except:
+        is_watching = False
+    context = {"listing": listing, "count": count, 'is_watching': is_watching}
     return render(request, 'auctions/listing.html', context)
 
 @login_required
 def watch_list(request):
     user = User.objects.get(pk=request.user.id)
-    watch_list = user.watch_list.all()
+    watch_list = user.watchlist.all()
     listings = [Listing.objects.get(pk=listing.listing_id) for listing in watch_list]
     context = {"listings": listings} 
     return render(request, "auctions/watch_list.html", context)
@@ -116,7 +120,7 @@ def add_watching(request, id):
     try:
         listing = WatchListing(owner=User.objects.get(pk=request.user.id), listing=Listing.objects.get(pk=id))
         listing.save()
-        return HttpResponseRedirect(reverse('index'))
+        return HttpResponseRedirect(reverse('open_listing', args=[id,]))
     except:
         context = {"message": "Something went wrong."}
         response = render(request, 'auctions/404.html', context)
@@ -140,5 +144,14 @@ def close_auction(request, id):
     return HttpResponseRedirect(reverse('index'))
 
 @login_required
-def delete_watchlist(request, id):
-    pass
+def remove_watching(request, id):
+    try:
+        listing = WatchListing.objects.get(owner=User.objects.get(pk=request.user.id), listing=Listing.objects.get(pk=id))
+        print(listing)
+        listing.delete()
+        return HttpResponseRedirect(reverse('open_listing', args=[id,]))
+    except:
+        context = {"message": "Something went wrong."}
+        response = render(request, 'auctions/404.html', context)
+        response.status_code = 404
+        return response

@@ -2,6 +2,15 @@
 
 {% block body %}
     <div style="font-weight:bold; font-size:30px;">Listing: {{listing.title}}</div>
+    {% if is_watching %}
+        <div style="background-color: rgb(50, 50, 50); border-radius: 5px; width: 75px; height: 32px; padding: 4.5px;">
+            <a href="{% url 'remove_watching' listing.id %}" style="text-decoration: none; color: white;">Watchlist</a>
+        </div>
+    {% else %}
+        <div style="background-color: rgb(222, 222, 222); border-radius: 5px; width: 130px; height: 32px; padding: 4.5px; margin: 3px;">
+            <a href="{% url 'add_watching' listing.id %}" style="text-decoration: none; color: black;">Add to Watchlist</a>
+        </div>
+    {% endif %}
     <div style="width:100%; height: 320px;"><img style="width: 350px; height: 300px;" src="{{listing.image_url}}" alt=""></div>
     <div>{{listing.description}}</div>
     <div style="font-weight:bold; font-size:25px;">${{listing.current_price}}</div>
