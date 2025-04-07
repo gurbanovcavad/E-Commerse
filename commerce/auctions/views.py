@@ -5,7 +5,7 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 
-from .models import User, Listing, WatchListing, Bid, Comment
+from .models import User, Listing, WatchListing, Bid, Comment, Category
 
 def index(request):
     context = {"listings": Listing.objects.all()}
@@ -66,13 +66,30 @@ def create_listing(request):
         description = request.POST["description"]
         starting_bid = request.POST["starting_bid"]
         image_url = request.POST["image_url"]
-        category = request.POST["category"]
+        if request.POST["category"]: 
+            try:
+                category = Category(name=request.POST["category"].lower())
+                category.save()
+            except:
+                category = Category.objects.get(name=request.POST["category"].lower())
+        else:
+            category = None
         owner = request.user
         listing = Listing(title=title, description=description,
                           starting_bid=starting_bid, image_url=image_url, category=category, owner=owner)
         listing.save()
         return HttpResponseRedirect(reverse("index"))
     return render(request, "auctions/create_listing.html")
+
+def view_categories(request):
+    categories = Category.objects.all()
+    context = {'categories': categories}
+    return render(request, 'auctions/categories.html', context)
+
+def open_category(request, id):
+    category = Category.objects.get(pk=id)
+    listings = category.listings.all()
+    return render(request, 'auctions/open_category.html', {'listings': listings})
 
 def place_bid(request, id):
     if request.method == 'POST':

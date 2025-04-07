@@ -1,8 +1,6 @@
-{% extends "auctions/layout.html" %}
+{% extends 'auctions/layout.html' %}
 
 {% block body %}
-    <h2>Active Listings</h2>
-
     {% for listing in listings %}
         <div class="listing">
                 <a class="listing" href="{% url 'open_listing' listing.id %}">
@@ -16,12 +14,6 @@
                         <div class="price">Price: ${{listing.current_price}}</div>
                         <!-- <div class="description">Description: {{listing.description}}</div> -->
                         <div class="created-at" style="margin-bottom:10px;">Created {{listing.created_at}}</div>
-                        {% if request.user.id == listing.owner.id and listing.is_active %}
-                            <form action="{% url 'close_auction' listing.id %}" method="post"> 
-                                {% csrf_token %}
-                                <input type="submit" value="Close">
-                            </form>
-                        {% endif %}
                     </div>
                 </a>
         </div>
