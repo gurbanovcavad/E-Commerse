@@ -5,7 +5,7 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 
-from .models import User, Listing, WatchListing, Bid
+from .models import User, Listing, WatchListing, Bid, Comment
 
 def index(request):
     context = {"listings": Listing.objects.all()}
@@ -100,11 +100,12 @@ def place_bid(request, id):
 def open_listing(request, id):
     listing = Listing.objects.get(pk=id)
     count = Listing.objects.get(pk=id).bids.all().count()
+    comments = listing.comments.all()
     try:
         is_watching = True if User.objects.get(pk=request.user.id).watchlist.get(listing=id) else False
     except:
         is_watching = False
-    context = {"listing": listing, "count": count, 'is_watching': is_watching}
+    context = {"listing": listing, "count": count, 'is_watching': is_watching, 'comments': comments}
     return render(request, 'auctions/listing.html', context)
 
 @login_required
@@ -155,3 +156,23 @@ def remove_watching(request, id):
         response = render(request, 'auctions/404.html', context)
         response.status_code = 404
         return response
+    
+@login_required
+def add_comment(request):
+    if request.method == 'POST':
+        listing = Listing.objects.get(pk=int(request.POST["listing"]))
+        print(listing)
+        content = request.POST["content"]
+        print(content)
+        author = request.user
+        print(author)
+        try:
+            comment = Comment(author=author, content=content, listing=listing)
+            comment.save()
+            print(comment)
+            return HttpResponseRedirect(reverse('open_listing', args=[listing.id]))
+        except:
+            context = {"message": "Something went wrong."}
+            response = render(request, 'auctions/404.html', context)
+            response.status_code = 404
+            return response

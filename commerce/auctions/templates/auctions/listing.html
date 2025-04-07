@@ -16,29 +16,45 @@
     <div style="font-weight:bold; font-size:25px;">${{listing.current_price}}</div>
 
     {% if request.user.is_authenticated and listing.is_active %}
-        <div>{{count}} bid(s) so far. Your bid is the current bid.</div>
-        <form action="{% url 'place_bid' listing.id %}" style="margin-left:1px;" method="post">
-            {% csrf_token %}
-            <input type="text" name="bid" placeholder="Bid" style="display: block; width: 100%; height: 45px; margin-bottom: 8px; padding: 8px; border-radius: 5px;">
-            <input type="submit" value="Place Bid" style="background-color: rgb(82, 82, 252); color: white; border: 0.1px; border-radius: 5px; width: 110px; height: 45px; font-size:19px;">
-        </form>
+    <div>{{count}} bid(s) so far. Your bid is the current bid.</div>
+    <form action="{% url 'place_bid' listing.id %}" style="margin-left:1px;" method="post">
+        {% csrf_token %}
+        <input type="text" name="bid" placeholder="Bid" style="display: block; width: 100%; height: 45px; margin-bottom: 8px; padding: 8px; border-radius: 5px;">
+        <input type="submit" value="Place Bid" style="background-color: rgb(82, 82, 252); color: white; border: 0.1px; border-radius: 5px; width: 110px; height: 45px; font-size:19px;">
+    </form>
     {% elif not listing.is_active %}
-        {% if request.user.id == listing.winner.id %}
-            <div style="font-size:30px;"><strong>You won this auction.</strong></div>
-        {% else %}
-            <div style="font-size:30px;"><strong>The auction is no longer active.</strong></div>
-        {% endif %}
+    {% if request.user.id == listing.winner.id %}
+    <div style="font-size:30px;"><strong>You won this auction.</strong></div>
+    {% else %}
+    <div style="font-size:30px;"><strong>The auction is no longer active.</strong></div>
     {% endif %}
-
-
+    {% endif %}
+    
+    
     <h3>Details:</h2>
     <ul>
         <li>Listed by {{listing.owner}}</li>
-
+        
         {% if listing.category %} 
-            <li>Category: {{listing.category}}</li>
+        <li>Category: {{listing.category}}</li>
         {% else %}
-            <li>Category: No Category Listed</li>
+        <li>Category: No Category Listed</li>
         {% endif %}
     </ul>
+
+    <h2 style="margin: 3px;">Comments: </h2>
+    {% for comment in comments %}
+        <div style="margin: 3px; font-size: 12px; color: rgb(97, 97, 97);">{{comment.author}} commented on {{comment.timestamp}}</div>
+        <div style="margin: 3px;">{{comment.content}}</div>
+    {% empty %}
+        <div style="margin: 3px;">No comment yet.</div>
+    {% endfor %}
+    {% if request.user.is_authenticated %}
+        <form action="{% url 'add_comment' %}" method="post" style="margin: 1px;">
+            {% csrf_token %}
+            <input type="hidden" name="listing" value="{{listing.id}}">
+            <input type="text" name="content" placeholder="Add a comment" style="width:400px; display: block; margin: 3px;">
+            <input type="submit" value="Submit"> 
+        </form>
+    {% endif %}
 {% endblock %}
