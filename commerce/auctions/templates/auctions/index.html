@@ -15,7 +15,7 @@
                         <div class="title">{{listing.title}}</div>
                         <div class="price">Price: ${{listing.current_price}}</div>
                         <!-- <div class="description">Description: {{listing.description}}</div> -->
-                        <div class="created-at" style="margin-bottom:10px;">Created {{listing.created_at}}</div>
+                        <div class="created-at" style="margin-bottom:10px;">Created on {{listing.created_at}}</div>
                         {% if request.user.id == listing.owner.id and listing.is_active %}
                             <form action="{% url 'close_auction' listing.id %}" method="post"> 
                                 {% csrf_token %}
