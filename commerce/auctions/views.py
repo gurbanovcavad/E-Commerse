@@ -11,16 +11,13 @@ def index(request):
     context = {"listings": Listing.objects.all()}
     return render(request, "auctions/index.html", context)
 
-
 def login_view(request):
     if request.method == "POST":
 
-        # Attempt to sign user in
         username = request.POST["username"]
         password = request.POST["password"]
         user = authenticate(request, username=username, password=password)
 
-        # Check if authentication successful
         if user is not None:
             login(request, user)
             return HttpResponseRedirect(reverse("index"))
@@ -29,26 +26,22 @@ def login_view(request):
         })
     return render(request, "auctions/login.html")
 
-
 def logout_view(request):
     logout(request)
     return HttpResponseRedirect(reverse("index"))
-
 
 def register(request):
     if request.method == "POST":
         username = request.POST["username"]
         email = request.POST["email"]
 
-        # Ensure password matches confirmation
         password = request.POST["password"]
-        confirmation = request.POST["confirmation"]
-        if password != confirmation:
+        confirmation_p = request.POST["confirmation"]
+        if password != confirmation_p:
             return render(request, "auctions/register.html", {
                 "message": "Passwords must match."
             })
 
-        # Attempt to create new user
         try:
             user = User.objects.create_user(username, email, password)
             user.save()
@@ -60,6 +53,7 @@ def register(request):
         return HttpResponseRedirect(reverse("index"))
     return render(request, "auctions/register.html")
 
+# create listing and category 
 def create_listing(request):
     if request.method == "POST":
         title = request.POST["title"]
@@ -112,14 +106,15 @@ def place_bid(request, id):
             response.status_code = 404
             return response
     return HttpResponseRedirect(reverse('index'))
-       
+   
+# bids_count, comments, is_watching     
 @login_required 
 def open_listing(request, id):
     listing = Listing.objects.get(pk=id)
     count = Listing.objects.get(pk=id).bids.all().count()
     comments = listing.comments.all()
     try:
-        is_watching = True if User.objects.get(pk=request.user.id).watchlist.get(listing=id) else False
+        is_watching = True if User.objects.get(pk=request.user.id).watchlist.get(listing=listing) else False
     except:
         is_watching = False
     context = {"listing": listing, "count": count, 'is_watching': is_watching, 'comments': comments}
@@ -145,6 +140,7 @@ def add_watching(request, id):
         response.status_code = 404
         return response
     
+# close the listing and find the winner 
 @login_required    
 def close_auction(request, id):
     if request.method == "POST":
@@ -193,3 +189,4 @@ def add_comment(request):
             response = render(request, 'auctions/404.html', context)
             response.status_code = 404
             return response
+    return HttpResponseRedirect(reverse('index'))

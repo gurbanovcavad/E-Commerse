@@ -1,60 +1,68 @@
 {% extends 'auctions/layout.html' %}
 
 {% block body %}
-    <div style="font-weight:bold; font-size:30px;">Listing: {{listing.title}}</div>
-    {% if is_watching %}
-        <div style="background-color: rgb(50, 50, 50); border-radius: 5px; width: 75px; height: 32px; padding: 4.5px;">
-            <a href="{% url 'remove_watching' listing.id %}" style="text-decoration: none; color: white;">Watchlist</a>
-        </div>
-    {% else %}
-        <div style="background-color: rgb(222, 222, 222); border-radius: 5px; width: 130px; height: 32px; padding: 4.5px; margin: 3px;">
-            <a href="{% url 'add_watching' listing.id %}" style="text-decoration: none; color: black;">Add to Watchlist</a>
-        </div>
-    {% endif %}
-    <div style="width:100%; height: 320px;"><img style="width: 350px; height: 300px;" src="{{listing.image_url}}" alt=""></div>
-    <div>{{listing.description}}</div>
-    <div style="font-weight:bold; font-size:25px;">${{listing.current_price}}</div>
+<div class="single-listing-container">
+    <h1 class="single-listing-title">{{ listing.title }}</h1>
 
-    {% if request.user.is_authenticated and listing.is_active %}
-    <div>{{count}} bid(s) so far. Your bid is the current bid.</div>
-    <form action="{% url 'place_bid' listing.id %}" style="margin-left:1px;" method="post">
+    {% if is_watching %}
+    <a href="{% url 'remove_watching' listing.id %}" class="watchlist-btn watching">Watchlist</a>
+    {% else %}
+    <a href="{% url 'add_watching' listing.id %}" class="watchlist-btn">Add to Watchlist</a>
+    {% endif %}
+
+    <div class="single-listing-image">
+        <img src="{{ listing.image_url }}" alt="{{ listing.title }}">
+    </div>
+
+    <p class="single-listing-description">{{ listing.description }}</p>
+    <div class="single-listing-price">${{ listing.current_price }}</div>
+
+    {% if request.user.is_authenticated and listing.is_active and request.user != listing.owner %}
+    <p class="bids-info">{{ count }} bid(s) so far. Your bid is the current bid.</p>
+    <form action="{% url 'place_bid' listing.id %}" method="post" class="bid-form">
         {% csrf_token %}
-        <input type="text" name="bid" placeholder="Bid" style="display: block; width: 100%; height: 45px; margin-bottom: 8px; padding: 8px; border-radius: 5px;">
-        <input type="submit" value="Place Bid" style="background-color: rgb(82, 82, 252); color: white; border: 0.1px; border-radius: 5px; width: 110px; height: 45px; font-size:19px;">
+        <input type="text" name="bid" placeholder="Enter your bid">
+        <button type="submit">Place Bid</button>
     </form>
     {% elif not listing.is_active %}
-    {% if request.user.id == listing.winner.id %}
-    <div style="font-size:30px;"><strong>You won this auction.</strong></div>
-    {% else %}
-    <div style="font-size:30px;"><strong>The auction is no longer active.</strong></div>
-    {% endif %}
-    {% endif %}
-    
-    
-    <h3>Details:</h2>
-    <ul>
-        <li>Listed by {{listing.owner}}</li>
-        
-        {% if listing.category %} 
-        <li>Category: {{listing.category}}</li>
+        {% if request.user.id == listing.winner.id %}
+        <div class="auction-message success">You won this auction.</div>
         {% else %}
-        <li>Category: No Category Listed</li>
+        <div class="auction-message ended">The auction is no longer active.</div>
         {% endif %}
-    </ul>
-
-    <h2 style="margin: 3px;">Comments: </h2>
-    {% for comment in comments %}
-        <div style="margin: 3px; font-size: 12px; color: rgb(97, 97, 97);">{{comment.author}} commented on {{comment.timestamp}}</div>
-        <div style="margin: 3px;">{{comment.content}}</div>
-    {% empty %}
-        <div style="margin: 3px;">No comment yet.</div>
-    {% endfor %}
-    {% if request.user.is_authenticated %}
-        <form action="{% url 'add_comment' %}" method="post" style="margin: 1px;">
-            {% csrf_token %}
-            <input type="hidden" name="listing" value="{{listing.id}}">
-            <input type="text" name="content" placeholder="Add a comment" style="width:400px; display: block; margin: 3px;">
-            <input type="submit" value="Submit"> 
-        </form>
     {% endif %}
+
+    <div class="listing-details-box">
+        <h3>Details:</h3>
+        <ul>
+            <li>Listed by {{ listing.owner }}</li>
+            {% if listing.category %}
+            <li>Category: {{ listing.category }}</li>
+            {% else %}
+            <li>Category: No Category Listed</li>
+            {% endif %}
+        </ul>
+    </div>
+
+    <div class="comments-section">
+        <h3>Comments</h3>
+        {% for comment in comments %}
+        <div class="comment">
+            <div class="comment-meta">{{ comment.author }} commented on {{ comment.timestamp }}</div>
+            <div class="comment-content">{{ comment.content }}</div>
+        </div>
+        {% empty %}
+        <div class="no-comments">No comment yet.</div>
+        {% endfor %}
+
+        {% if request.user.is_authenticated %}
+        <form action="{% url 'add_comment' %}" method="post" class="comment-form">
+            {% csrf_token %}
+            <input type="hidden" name="listing" value="{{ listing.id }}">
+            <input type="text" name="content" placeholder="Add a comment">
+            <button type="submit">Submit</button>
+        </form>
+        {% endif %}
+    </div>
+</div>
 {% endblock %}
