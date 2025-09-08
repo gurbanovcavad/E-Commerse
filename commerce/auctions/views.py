@@ -69,10 +69,15 @@ def create_listing(request):
         else:
             category = None
         owner = request.user
-        listing = Listing(title=title, description=description,
-                          starting_bid=starting_bid, image_url=image_url, category=category, owner=owner)
-        listing.save()
-        return HttpResponseRedirect(reverse("index"))
+        try:
+            listing = Listing(title=title, description=description,
+                            starting_bid=starting_bid, image_url=image_url, category=category, owner=owner)
+            listing.save()
+            return HttpResponseRedirect(reverse("index"))
+        except:
+            response = render(request, "auctions/404.html", {"message": "Something went wrong"})
+            response.status_code = 404
+            return response
     return render(request, "auctions/create_listing.html")
 
 def view_categories(request):
@@ -152,11 +157,17 @@ def close_auction(request, id):
         if not bids:
             listing.save()
             return HttpResponseRedirect(reverse('index'))
-        max_bid = max(bids, key=lambda x: x.amount)
-        listing.winner = max_bid.bidder
-        listing.save()
-        print(listing.is_active)
-        return HttpResponseRedirect(reverse('index'))
+        try:
+            max_bid = max(bids, key=lambda x: x.amount)
+            listing.winner = max_bid.bidder
+            listing.save()
+            print(listing.is_active)
+            return HttpResponseRedirect(reverse('index'))
+        except:
+            context = {"message": "Something went wrong."}
+            response = render(request, 'auctions/404.html', context)
+            response.status_code = 404
+            return response
     return HttpResponseRedirect(reverse('index'))
 
 @login_required
