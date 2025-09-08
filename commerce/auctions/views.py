@@ -124,7 +124,9 @@ def open_listing(request, id):
 def watch_list(request):
     user = User.objects.get(pk=request.user.id)
     watch_list = user.watchlist.all()
-    listings = [Listing.objects.get(pk=listing.listing_id) for listing in watch_list]
+    # print(watch_list)
+    listings = [Listing.objects.get(pk=x.listing.id) for x in watch_list]
+    # print(listings)
     context = {"listings": listings} 
     return render(request, "auctions/watch_list.html", context)
 
